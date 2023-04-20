@@ -181,7 +181,7 @@ class CovertypeClassifier:
         print("Confusion Matrix:")
         print(cm)
 
-        # Calculate the accuracy sensitivity and specificity
+        # Calculate the sensitivity and specificity
         num_classes = cm.shape[0]
         for i in range(num_classes):
             TP = cm[i][i]
