@@ -172,3 +172,30 @@ class CovertypeClassifier:
         plt.plot(r.history['val_accuracy'], label='val_accuracy')
         plt.legend()
         plt.show()
+
+    def evaluate(self, y_pred_method):
+        """Method is used for evaluating the performance of the model. It takes y_pred_method as an argument,
+         which is the predicted values of the target variable. It calculates the confusion matrix, sensitivity,
+         specificity, and accuracy for each class, and prints them to the console."""
+        # Calculate confusion_matrix
+        cm = confusion_matrix(self.y_test, y_pred_method)
+        print("Confusion Matrix:")
+        print(cm)
+
+        # Calculate the accuracy sensitivity and specificity
+        num_classes = cm.shape[0]
+        for i in range(num_classes):
+            TP = cm[i][i]
+            FP = sum(cm[:, i]) - TP
+            FN = sum(cm[i, :]) - TP
+            TN = cm.sum() - TP - FP - FN
+
+            sensitivity = TP / (TP + FN)
+            specificity = TN / (TN + FP)
+
+            print(f"Class {i}: Sensitivity={sensitivity:.3f}, Specificity={specificity:.3f}")
+
+        # Calculate the accuracy
+        acc = accuracy_score(self.y_test, y_pred_method)
+        print(f"Accuracy: {acc}")
+        print('\n--------------------------------------------\n')
