@@ -111,3 +111,64 @@ class CovertypeClassifier:
 
         # Save the model
         joblib.dump(self.lr, 'lr_model.joblib')
+
+    def create_model(self, num_hidden_layers, num_neurons, learning_rate):
+        """Method creates a Keras sequential model with the specified number of hidden layers, number of neurons, and learning rate.
+         It compiles the model with the Adam optimizer, sparse_categorical_crossentropy loss, and accuracy metric."""
+        model = tf.keras.Sequential()
+        model.add(tf.keras.layers.Input(shape=(self.X_train_scaled.shape[1],)))
+        for _ in range(num_hidden_layers):
+            model.add(tf.keras.layers.Dense(num_neurons, activation='relu'))
+            model.add(tf.keras.layers.Dropout(rate=0.2))
+        model.add(tf.keras.layers.Activation('softmax'))
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+                      loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        return model
+
+    def grid_search(self):
+        """ method performs a grid search over a range of hyperparameters to find the best combination
+        of hyperparameters for the Keras model."""
+        param_grid = {
+            'num_hidden_layers': [1, 2, 3],
+            'num_neurons': [16, 32, 64],
+            'learning_rate': [0.1, 0.01, 0.001]
+        }
+        model = KerasClassifier(build_fn=self.create_model, epochs=100, batch_size=32)
+
+        # Perform the grid search
+        search = GridSearchCV(model, param_grid=param_grid, cv=5)
+        search.fit(self.X_train_scaled, self.y_train)
+
+        # The best hyperparameters found
+        num_neurons, num_hidden_layers, learning_rate = search.best_params_.values()
+        return num_neurons, num_hidden_layers, learning_rate
+
+    def nn(self, with_grid_search=False):
+        """Method is used to train a neural network model. It provides the option of performing a grid search
+        for hyperparameter tuning by setting the with_grid_search argument to True. If this argument is set to True,
+        the method calls the grid_search() method to find the optimal values for the number of neurons, number of hidden layers,
+        and learning rate. If the with_grid_search argument is set to False, the method uses default values for these hyperparameters.
+        It saves the model in file: ann_model.joblib"""
+        if with_grid_search:
+            num_neurons, num_hidden_layers, learning_rate = self.grid_search()
+        else:
+            num_neurons, num_hidden_layers, learning_rate = 32, 2, 0.01
+
+        # Train the model
+        ann = self.create_model(num_hidden_layers, num_neurons, learning_rate)
+        r = ann.fit(self.X_train_scaled, self.y_train, validation_data=(self.X_val_scaled, self.y_val), epochs=100, batch_size=32)
+        self.y_pred_ann = np.argmax(ann.predict(self.X_test), axis=1)
+
+        # Save the trained model to a file
+        joblib.dump(ann, 'ann_model.joblib')
+
+        # Plot accuracy and loss
+        plt.plot(r.history['loss'], label='loss')
+        plt.plot(r.history['val_loss'], label='val_loss')
+        plt.legend()
+        plt.show()
+
+        plt.plot(r.history['accuracy'], label='accuracy')
+        plt.plot(r.history['val_accuracy'], label='val_accuracy')
+        plt.legend()
+        plt.show()
