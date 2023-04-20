@@ -93,3 +93,21 @@ class CovertypeClassifier:
 
         return y_pred_heuristic
 
+    def train_decision_tree_classifier(self):
+        """Method trains a decision tree classifier on the scaled training set using DecisionTreeClassifier
+        from the sklearn package, and stores the predictions for the test set in dtc_pred. It saves the model in file: dtc_model"""
+        self.dtc.fit(self.X_train_scaled, self.y_train)
+        self.dtc_pred = self.dtc.predict(self.X_test_scaled)
+
+        # Save the model
+        joblib.dump(self.lr, 'dtc_model.joblib')
+
+
+    def train_logistic_regression_classifier(self):
+        """Method trains a logistic regression classifier on the scaled training set using LogisticRegression
+        from the sklearn package, and stores the predictions for the test set in lr_pred. It saves the model in file: lr_model.joblib"""
+        self.lr.fit(self.X_train_scaled, self.y_train)
+        self.lr_pred = self.lr.predict(self.X_test_scaled)
+
+        # Save the model
+        joblib.dump(self.lr, 'lr_model.joblib')
