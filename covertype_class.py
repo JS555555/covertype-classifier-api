@@ -35,3 +35,33 @@ class CovertypeClassifier:
         self.scaler = StandardScaler()
         self.dtc = DecisionTreeClassifier(random_state=42)
         self.lr = LogisticRegression(random_state=42, max_iter=100)
+
+    def load_data(self):
+        """Method reads in the dataset from the specified data_path using pandas read_csv method"""
+        self.df = pd.read_csv(self.data_path, header=None, sep=',')
+
+    def balance_data(self, Undersample=False):
+        """Method performs either undersampling or oversampling of the dataset"""
+        X = self.df.iloc[:, :-1]
+        y = self.df.iloc[:, -1]
+        if Undersample:
+            ros = RandomUnderSampler(random_state=42)
+        else:
+            ros = RandomOverSampler(random_state=42)
+
+        self.X_resampled, self.y_resampled = ros.fit_resample(X, y)
+
+    def train_val_test_split(self):
+        """Method splits the balanced dataset into train, validation, and test sets.
+        The resulting arrays are stored in X_train, X_val, X_test, y_train, y_val, and y_test."""
+        X_train_val, self.X_test, y_train_val, self.y_test = train_test_split(self.X_resampled, self.y_resampled, test_size=0.1, random_state=42)
+        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(X_train_val, y_train_val, test_size=0.2, random_state=42)
+
+
+    def scale_data(self):
+        """Method scales the train, validation, and test sets.
+         The scaled data is stored in X_train_scaled, X_val_scaled, and X_test_scaled."""
+        self.X_train_scaled = self.scaler.fit_transform(self.X_train)
+        self.X_test_scaled = self.scaler.transform(self.X_test)
+        self.X_val_scaled = self.scaler.transform(self.X_val)
+
