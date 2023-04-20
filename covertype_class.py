@@ -13,6 +13,7 @@ from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, accuracy_score
 
+
 class CovertypeClassifier:
     def __init__(self, data_path='/Users/jakubszafranski/Desktop/covtype'):
         self.data_path = data_path
@@ -57,7 +58,6 @@ class CovertypeClassifier:
         X_train_val, self.X_test, y_train_val, self.y_test = train_test_split(self.X_resampled, self.y_resampled, test_size=0.1, random_state=42)
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(X_train_val, y_train_val, test_size=0.2, random_state=42)
 
-
     def scale_data(self):
         """Method scales the train, validation, and test sets.
          The scaled data is stored in X_train_scaled, X_val_scaled, and X_test_scaled."""
@@ -101,7 +101,6 @@ class CovertypeClassifier:
 
         # Save the model
         joblib.dump(self.lr, 'dtc_model.joblib')
-
 
     def train_logistic_regression_classifier(self):
         """Method trains a logistic regression classifier on the scaled training set using LogisticRegression
