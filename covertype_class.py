@@ -65,3 +65,31 @@ class CovertypeClassifier:
         self.X_test_scaled = self.scaler.transform(self.X_test)
         self.X_val_scaled = self.scaler.transform(self.X_val)
 
+    def simple_heuristic_classification(self, X_):
+        """Method performs a simple heuristic classification based on a feature in the dataset.
+        It stores the predictions for the test set in y_pred_heuristic_test."""
+
+        N_test = self.X_test.shape[0]
+        self.y_pred_heuristic_test = np.zeros(N_test)
+
+        self.y_pred_heuristic_test[self.X_test[1] < 60] = 0
+        self.y_pred_heuristic_test[(self.X_test[1] >= 60) & (self.X_test[1] < 120)] = 1
+        self.y_pred_heuristic_test[(self.X_test[1] >= 120) & (self.X_test[1] < 180)] = 2
+        self.y_pred_heuristic_test[(self.X_test[1] >= 180) & (self.X_test[1] < 240)] = 3
+        self.y_pred_heuristic_test[(self.X_test[1] >= 300) & (self.X_test[1] < 320)] = 4
+        self.y_pred_heuristic_test[(self.X_test[1] >= 320) & (self.X_test[1] < 340)] = 5
+        self.y_pred_heuristic_test[self.X_test[1] >= 340] = 6
+
+        N_train = X_.shape[0]
+        y_pred_heuristic = np.zeros(N_train)
+
+        y_pred_heuristic[X_[1] < 60] = 0
+        y_pred_heuristic[(X_[1] >= 60) & (X_[1] < 120)] = 1
+        y_pred_heuristic[(X_[1] >= 120) & (X_[1] < 180)] = 2
+        y_pred_heuristic[(X_[1] >= 180) & (X_[1] < 240)] = 3
+        y_pred_heuristic[(X_[1] >= 300) & (X_[1] < 320)] = 4
+        y_pred_heuristic[(X_[1] >= 320) & (X_[1] < 340)] = 5
+        y_pred_heuristic[X_[1] >= 340] = 6
+
+        return y_pred_heuristic
+
